@@ -35,9 +35,9 @@ const tabs = [
 
 
 // ⚠️ 核心改造 3: 定义本地 Web 资源的 URI
-// 假设您将 Web App 的 'build' 文件夹复制到了 AppShellV2 的根目录
+// build 文件夹已复制到 AppShellV2 目录下
 const WEB_APP_URI = Platform.select({
-  ios: require('../build/index.html'), 
+  ios: require('./build/index.html'), 
   android: { uri: 'file:///android_asset/build/index.html' }, // Android 打包后的特殊路径
   web: 'http://localhost:3000', // Web 模式仍然使用开发服务器
 });
