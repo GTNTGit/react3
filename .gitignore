@@ -1,29 +1,22 @@
 # Dependencies
 node_modules/
 
-# 排除所有包含"归档"的文件夹和文件（无论位置和扩展名）
+# 排除所有包含"归档"的文件夹和压缩文件
 *归档*/
-*归档*.zip
-*归档*.rar
-*归档*.7z
-*归档*.tar
-*归档*.tar.gz
-*归档*.tar.bz2
-*归档*.gz
-*归档*.bz2
 **/*归档*/
-**/*归档*.zip
-**/*归档*.rar
-**/*归档*.7z
-**/*归档*.tar
-**/*归档*.tar.gz
-**/*归档*.tar.bz2
-**/*归档*.gz
-**/*归档*.bz2
+*归档*.{zip,rar,7z,tar,tar.gz,tar.bz2,gz,bz2}
+**/*归档*.{zip,rar,7z,tar,tar.gz,tar.bz2,gz,bz2}
 
 # Build outputs
 dist/
 **/dist/
+
+# 大文件排除（超过 100MB）
+*.{mp4,mov,avi,mkv,webm}
+*.{zip,rar,7z,tar,tar.gz,tar.bz2}
+*.{dmg,iso,img}
+*.{psd,ai,sketch}
+*.{db,sqlite,sqlite3}
 
 # Environment variables
 .env
