@@ -1,4 +1,4 @@
-// AppShellV2/App.tsx (引入原生 Tab Bar 和导航逻辑)
+// AppShellV2/App.tsx (添加原生指令处理逻辑)
 
 import React, { useRef, useState } from 'react';
 
@@ -6,7 +6,9 @@ import React, { useRef, useState } from 'react';
 
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 
-import { StyleSheet, SafeAreaView, Platform, View, Text, StatusBar, TouchableOpacity } from 'react-native';
+// ⚠️ 核心改造 1: 导入 Alert 和 Linking (用于 App 原生功能)
+
+import { StyleSheet, SafeAreaView, Platform, View, Text, StatusBar, TouchableOpacity, Alert, Linking } from 'react-native';
 
 // ⚠️ 核心改造 2: 导入图标 (需要安装 Expo 默认支持的图标库)
 
@@ -180,27 +182,73 @@ export default function App() {
 
     
 
-    // 核心改造 5: 监听 Web -> App 通信
+    // 核心改造 2: 监听 Web -> App 通信，处理所有指令
 
     const handleWebViewMessage = (event: WebViewMessageEvent) => {
 
-        const data = JSON.parse(event.nativeEvent.data);
+        const dataString = event.nativeEvent.data;
 
         
 
-        if (data.type === 'ROUTE_CHANGE' && data.path) {
+        try {
 
-            // Web App 告诉 App 壳它内部发生了路由变化 (例如：点击 Web App 内部链接)
+            const data = JSON.parse(dataString);
 
-            setCurrentPath(data.path);
+            
+
+            // --- 路由同步 (Phase C 逻辑) ---
+
+            if (data.type === 'ROUTE_CHANGE' && data.path) {
+
+                setCurrentPath(data.path);
+
+                return;
+
+            }
+
+            
+
+            // --- 原生功能调用 (Phase D 逻辑) ---
+
+            switch (data.type) {
+
+                case 'SHOW_TOAST':
+
+                    // 调用 App 原生 Alert 替代 Toast
+
+                    Alert.alert("来自 Web App 的通知", data.payload?.message || "无内容");
+
+                    break;
+
+                case 'SHARE_CONTENT':
+
+                    // 这里可以调用原生 Sharing API，但 Alert 仅作演示
+
+                    Alert.alert("分享指令", `分享内容: ${data.payload?.content}`);
+
+                    break;
+
+                case 'OPEN_URL_EXTERNAL':
+
+                    // 打开外部链接 (例如：客服链接)
+
+                    if (data.payload?.url) {
+
+                        Linking.openURL(data.payload.url);
+
+                    }
+
+                    break;
+
+                // 添加更多原生功能...
+
+            }
+
+        } catch (e) {
+
+            console.error("Error processing message from Webview:", e, dataString);
 
         }
-
-        
-
-        // 可以在这里处理 Web App 发送的其他原生指令，例如：
-
-        // if (data.type === 'SHARE') { /* 调用原生分享 API */ }
 
     };
 
