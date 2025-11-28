@@ -297,3 +297,36 @@ textarea:not([class*="bg-transparent"]):not([style*="background"]):focus {
 .animate-slide-up {
   animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+/* -----------------------------------------------
+ * ⚠️ 核心修复 2: 仅在 App 环境中应用的 Webview 安全区填充 
+ * ----------------------------------------------- */
+
+/* 确保根容器有最小安全区高度 */
+#root {
+  min-height: 100vh;
+}
+
+/* 顶部固定栏目（TopBar）的安全区填充 */
+.top-0 { 
+  /* 仅在 Webview 环境中应用，为顶部状态栏预留空间 */
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* 底部固定栏目（BottomTabs）的安全区填充 */
+.bottom-0 { 
+  /* 解决底部被 Home Indicator 遮挡的问题 */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* 确保页面主体内容可以滚动到最底部 */
+.min-h-screen {
+  /* 调整 min-h-screen 以配合新的安全区 */
+  min-height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+}
+
+/* 隐藏 Web App 自己的底部导航栏，App 壳将使用原生 Tab Bar 取代 */
+/* ⚠️ 核心改造 3: 隐藏 BottomTabs.tsx (它有 fixed bottom-0 left-0 right-0 z-50 类名) */
+.fixed.bottom-0.left-0.right-0.z-50 {
+  display: none !important; /* 强制隐藏 Web 的底部导航栏 */
+}
