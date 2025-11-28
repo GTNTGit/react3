@@ -1,12 +1,10 @@
-// App.tsx (添加原生指令处理逻辑)
+// App.tsx (加载本地静态文件)
 
 import React, { useRef, useState } from 'react';
 
-// ⚠️ 核心改造 1: 导入 WebView 组件和类型
-
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 
-// ⚠️ 核心改造 1: 导入 Alert 和 Linking (用于 App 原生功能)
+// ⚠️ 核心改造 1: 导入 Platform 和 requireNativeComponent
 
 import { StyleSheet, SafeAreaView, Platform, View, Text, StatusBar, TouchableOpacity, Alert, Linking } from 'react-native';
 
@@ -36,14 +34,12 @@ const tabs = [
 
 
 
-const WEB_APP_URL = Platform.select({
-
-  ios: 'http://localhost:3000', 
-
-  web: 'http://localhost:3000', 
-
-  default: 'http://192.168.110.168:3000', 
-
+// ⚠️ 核心改造 3: 定义本地 Web 资源的 URI
+// 假设您将 Web App 的 'build' 文件夹复制到了 AppShellV2 的根目录
+const WEB_APP_URI = Platform.select({
+  ios: require('./build/index.html'), 
+  android: { uri: 'file:///android_asset/build/index.html' }, // Android 打包后的特殊路径
+  web: 'http://localhost:3000', // Web 模式仍然使用开发服务器
 });
 
 
@@ -138,7 +134,7 @@ export default function App() {
 
             <View style={styles.container}>
 
-                <Text>Web 应用运行于：{WEB_APP_URL}</Text>
+                <Text>Web 应用运行于：{typeof WEB_APP_URI === 'string' ? WEB_APP_URI : '本地文件'}</Text>
 
             </View>
 
@@ -266,9 +262,11 @@ export default function App() {
 
                 <WebView
 
-                    ref={webViewRef} // 绑定 Ref
+                    ref={webViewRef}
 
-                    source={{ uri: WEB_APP_URL }}
+                    // ⚠️ 核心改造 4: source 中直接使用本地文件路径
+
+                    source={WEB_APP_URI} 
 
                     javaScriptEnabled={true}
 
@@ -276,7 +274,11 @@ export default function App() {
 
                     style={styles.webView} 
 
-                    onMessage={handleWebViewMessage} // 接收 Webview 消息
+                    onMessage={handleWebViewMessage}
+
+                    // 必须允许所有内部导航，因为它是本地文件
+
+                    onShouldStartLoadWithRequest={() => true} 
 
                 />
 
