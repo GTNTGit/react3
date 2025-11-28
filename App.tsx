@@ -1,4 +1,4 @@
-// AppShellV2/App.tsx (引入原生 Tab Bar 和导航逻辑)
+// App.tsx (引入原生 Tab Bar 和导航逻辑)
 
 import React, { useRef, useState } from 'react';
 
@@ -299,4 +299,3 @@ const styles = StyleSheet.create({
     },
 
 });
-
