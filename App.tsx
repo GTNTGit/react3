@@ -1,14 +1,10 @@
-// App.tsx (加载本地静态文件)
+// App.tsx (恢复开发模式配置)
 
 import React, { useRef, useState } from 'react';
 
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 
-// ⚠️ 核心改造 1: 导入 Platform 和 requireNativeComponent
-
 import { StyleSheet, SafeAreaView, Platform, View, Text, StatusBar, TouchableOpacity, Alert, Linking } from 'react-native';
-
-// ⚠️ 核心改造 2: 导入图标 (需要安装 Expo 默认支持的图标库)
 
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 
@@ -34,12 +30,11 @@ const tabs = [
 
 
 
-// ⚠️ 核心改造 3: 定义本地 Web 资源的 URI
-// build 文件夹在项目根目录
-const WEB_APP_URI = Platform.select({
-  ios: require('./build/index.html'), 
-  android: { uri: 'file:///android_asset/build/index.html' }, // Android 打包后的特殊路径
-  web: 'http://localhost:3000', // Web 模式仍然使用开发服务器
+// ⚠️ 核心修正 1: 恢复为加载开发服务器 URL
+const WEB_APP_URL = Platform.select({
+  ios: 'http://localhost:3000', 
+  web: 'http://localhost:3000', 
+  default: 'http://192.168.110.168:3000', // 如果您用 Android 调试，依然使用 IP
 });
 
 
@@ -134,7 +129,7 @@ export default function App() {
 
             <View style={styles.container}>
 
-                <Text>Web 应用运行于：{typeof WEB_APP_URI === 'string' ? WEB_APP_URI : '本地文件'}</Text>
+                <Text>Web 应用运行于：{WEB_APP_URL}</Text>
 
             </View>
 
@@ -264,9 +259,9 @@ export default function App() {
 
                     ref={webViewRef}
 
-                    // ⚠️ 核心改造 4: source 中直接使用本地文件路径
+                    // ⚠️ 核心修正 2: source 中使用开发服务器 URL
 
-                    source={WEB_APP_URI} 
+                    source={{ uri: WEB_APP_URL }} 
 
                     javaScriptEnabled={true}
 
@@ -276,7 +271,7 @@ export default function App() {
 
                     onMessage={handleWebViewMessage}
 
-                    // 必须允许所有内部导航，因为它是本地文件
+                    // 允许所有内部导航
 
                     onShouldStartLoadWithRequest={() => true} 
 
